@@ -1,0 +1,425 @@
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+    --primary: #0d9488;          /* Teal دافئ يعبر عن الرعاية والصحة */
+    --primary-hover: #0f766e;
+    --primary-light: #f0fdfa;
+    --secondary: #1e293b;        /* Slate ناعم واحترافي */
+    --secondary-light: #f8fafc;
+    --accent: #f59e0b;           /* Amber دافئ للتقييمات والتنبيهات */
+    --success: #10b981;          /* Emerald أخضر للنجاح والقبول */
+    --danger: #ef4444;           /* Rose أحمر لطيف للتراجع والإلغاء */
+    --info: #06b6d4;             /* Cyan طبي ملائم للسجلات */
+    --text-main: #334155;        /* رمادي غامق مريح للعين بدلاً من الأسود الحاد */
+    --text-muted: #64748b;
+    --bg-body: #f8fafc;          /* خلفية الموقع ناصعة ومريحة */
+    --card-shadow: 0 4px 20px -2px rgba(13, 148, 136, 0.04), 0 2px 8px -1px rgba(0, 0, 0, 0.02);
+    --card-shadow-hover: 0 20px 25px -5px rgba(13, 148, 136, 0.08), 0 10px 10px -6px rgba(0, 0, 0, 0.03);
+    --border-radius-sm: 8px;
+    --border-radius-md: 12px;
+    --border-radius-lg: 20px;
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* تنسيق الخط والصفحة العام */
+body {
+    font-family: 'Cairo', sans-serif !important;
+    background-color: var(--bg-body);
+    color: var(--text-main);
+    line-height: 1.7;
+    margin-bottom: 60px;
+    font-size: 0.95rem;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 700;
+    color: var(--secondary);
+    margin-bottom: 0.5rem;
+}
+
+/* شريط التنقل (Navbar) ذو التصميم الإنساني */
+.navbar-custom {
+    background-color: rgba(255, 255, 255, 0.9) !important;
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(13, 148, 136, 0.08) !important;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.01);
+    padding: 0.8rem 1rem;
+    transition: var(--transition);
+}
+
+.navbar-custom .navbar-brand {
+    font-size: 1.5rem;
+    color: var(--primary) !important;
+    transition: var(--transition);
+}
+
+.navbar-custom .navbar-brand:hover {
+    transform: translateY(-1px);
+}
+
+.navbar-custom .nav-link {
+    color: var(--text-main) !important;
+    font-weight: 600;
+    padding: 0.5rem 1.2rem !important;
+    border-radius: var(--border-radius-sm);
+    transition: var(--transition);
+    display: inline-flex;
+    align-items: center;
+}
+
+.navbar-custom .nav-link:hover {
+    color: var(--primary) !important;
+    background-color: var(--primary-light);
+}
+
+.navbar-custom .nav-link.active {
+    color: var(--primary) !important;
+    background-color: var(--primary-light);
+}
+
+/* البطاقات (Cards) الطبية ذات الحواف الدائرية والظلال الناعمة */
+.med-card {
+    background: #ffffff;
+    border: 1px solid rgba(13, 148, 136, 0.05);
+    border-radius: var(--border-radius-md);
+    box-shadow: var(--card-shadow);
+    transition: var(--transition);
+    overflow: hidden;
+}
+
+.med-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--card-shadow-hover);
+    border-color: rgba(13, 148, 136, 0.15);
+}
+
+.med-card-header {
+    background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+    color: #ffffff;
+    padding: 1.5rem;
+    border: none;
+}
+
+/* الأزرار الطبية (Buttons) */
+.med-btn {
+    font-weight: 600;
+    padding: 0.6rem 1.5rem;
+    border-radius: 50px; /* تصميم كبسولي ناعم ومريح */
+    transition: var(--transition);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border: 1px solid transparent;
+}
+
+.med-btn-primary {
+    background-color: var(--primary);
+    color: #ffffff;
+}
+
+.med-btn-primary:hover {
+    background-color: var(--primary-hover);
+    color: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(13, 148, 136, 0.2);
+}
+
+.med-btn-secondary {
+    background-color: var(--secondary);
+    color: #ffffff;
+}
+
+.med-btn-secondary:hover {
+    background-color: #0f172a;
+    color: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(30, 41, 59, 0.2);
+}
+
+.med-btn-outline {
+    background-color: transparent;
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.med-btn-outline:hover {
+    background-color: var(--primary-light);
+    color: var(--primary-hover);
+    transform: translateY(-2px);
+}
+
+/* الحقول والمدخلات (Inputs) */
+.med-input {
+    border: 2px solid #e2e8f0;
+    border-radius: var(--border-radius-sm);
+    padding: 0.75rem 1rem;
+    transition: var(--transition);
+    font-size: 0.95rem;
+}
+
+.med-input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(13, 148, 136, 0.1);
+    outline: none;
+}
+
+/* شارات الحالة (Badges) */
+.med-badge {
+    padding: 0.4rem 1rem;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 0.8rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.med-badge-primary { background-color: var(--primary-light); color: var(--primary); }
+.med-badge-success { background-color: #ecfdf5; color: var(--success); }
+.med-badge-warning { background-color: #fffbeb; color: var(--accent); }
+.med-badge-danger { background-color: #fff1f2; color: var(--danger); }
+.med-badge-info { background-color: #f0f9ff; color: var(--info); }
+
+/* الجداول (Tables) */
+.med-table-container {
+    border-radius: var(--border-radius-md);
+    overflow: hidden;
+    background: #ffffff;
+    box-shadow: var(--card-shadow);
+    border: 1px solid rgba(13, 148, 136, 0.05);
+}
+
+.med-table {
+    margin-bottom: 0;
+}
+
+.med-table thead {
+    background-color: var(--secondary-light);
+}
+
+.med-table th {
+    font-weight: 700;
+    color: var(--text-main);
+    border-bottom: 2px solid #edf2f7;
+    padding: 1rem 1.25rem;
+}
+
+.med-table td {
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid #edf2f7;
+    vertical-align: middle;
+}
+
+.med-table tr:last-child td {
+    border-bottom: none;
+}
+
+/* الدوائر التعبيرية / صور رمزية للأطباء والمرضى (Avatar) */
+.med-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #ffffff;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    background: linear-gradient(135deg, var(--primary), var(--info));
+    flex-shrink: 0;
+}
+
+.med-avatar-patient {
+    background: linear-gradient(135deg, var(--info), #3b82f6);
+}
+
+/* التذييل الاحترافي (Footer) */
+.med-footer {
+    background-color: var(--secondary);
+    color: #94a3b8;
+    padding: 3rem 0 1.5rem 0;
+    margin-top: 5rem;
+    border-top: 4px solid var(--primary);
+}
+
+.med-footer h5 {
+    color: #ffffff;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+}
+
+.med-footer a {
+    color: #94a3b8;
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+.med-footer a:hover {
+    color: #ffffff;
+    padding-right: 5px;
+}
+
+/* بوابة الترحيب بالصفحة الرئيسية */
+.portal-hero {
+    padding: 5rem 0 3rem 0;
+    background: radial-gradient(circle at 10% 20%, rgba(13, 148, 136, 0.06) 0%, rgba(255, 255, 255, 0) 90%);
+}
+
+.portal-title {
+    font-size: 2.8rem;
+    font-weight: 800;
+    line-gradient: 1.3;
+    color: var(--secondary);
+}
+
+.portal-title span {
+    color: var(--primary);
+    position: relative;
+    display: inline-block;
+}
+
+.portal-title span::after {
+    content: '';
+    position: absolute;
+    bottom: 5px;
+    left: 0;
+    width: 100%;
+    height: 8px;
+    background-color: rgba(13, 148, 136, 0.15);
+    z-index: -1;
+    border-radius: 4px;
+}
+
+.portal-card {
+    background: #ffffff;
+    border-radius: var(--border-radius-lg);
+    border: 1px solid rgba(13, 148, 136, 0.08);
+    box-shadow: 0 10px 30px rgba(13, 148, 136, 0.03);
+    padding: 2.5rem 2rem;
+    text-align: center;
+    transition: var(--transition);
+}
+
+.portal-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(13, 148, 136, 0.08);
+    border-color: var(--primary);
+}
+
+.portal-icon-wrapper {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background-color: var(--primary-light);
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.2rem;
+    margin: 0 auto 1.5rem auto;
+    transition: var(--transition);
+}
+
+.portal-card:hover .portal-icon-wrapper {
+    background-color: var(--primary);
+    color: #ffffff;
+    transform: scale(1.1);
+}
+
+/* شريط الأعراض (Symptom Checker Bar) */
+.symptom-panel {
+    background: #ffffff;
+    border-radius: var(--border-radius-md);
+    box-shadow: var(--card-shadow);
+    padding: 1.5rem;
+    border: 1px solid rgba(13, 148, 136, 0.05);
+}
+
+.symptom-pill {
+    padding: 0.5rem 1.25rem;
+    background-color: var(--secondary-light);
+    border: 1px solid #edf2f7;
+    border-radius: 50px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: var(--transition);
+    user-select: none;
+}
+
+.symptom-pill:hover {
+    background-color: var(--primary-light);
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.symptom-pill.active {
+    background-color: var(--primary);
+    border-color: var(--primary);
+    color: #ffffff;
+    box-shadow: 0 4px 10px rgba(13, 148, 136, 0.2);
+}
+
+/* تنسيقات التقويم (FullCalendar) المخصصة للتجانس الطبعي */
+.fc .fc-toolbar-title {
+    font-weight: 700 !important;
+    color: var(--secondary) !important;
+    font-family: 'Cairo', sans-serif !important;
+}
+
+.fc .fc-button-primary {
+    background-color: var(--primary) !important;
+    border-color: var(--primary) !important;
+    font-weight: 600 !important;
+    font-family: 'Cairo', sans-serif !important;
+}
+
+.fc .fc-button-primary:hover {
+    background-color: var(--primary-hover) !important;
+    border-color: var(--primary-hover) !important;
+}
+
+.fc .fc-button-active {
+    background-color: var(--secondary) !important;
+    border-color: var(--secondary) !important;
+}
+
+.fc-event {
+    cursor: pointer;
+    border-radius: 4px !important;
+    padding: 2px 4px;
+    font-size: 0.85rem !important;
+    font-family: 'Cairo', sans-serif !important;
+}
+
+/* تحسين المدخلات الكبيرة والاستمارات */
+.auth-container {
+    max-width: 450px;
+    margin: 5rem auto;
+}
+
+.auth-card {
+    border-radius: var(--border-radius-lg);
+    background: #ffffff;
+    box-shadow: var(--card-shadow-hover);
+    overflow: hidden;
+    border: 1px solid rgba(0,0,0,0.02);
+}
+
+/* مخطط أوقات العمل للعيادة */
+.day-planner-card {
+    border-bottom: 1px dashed #edf2f7;
+    padding: 1rem 0;
+    transition: var(--transition);
+}
+
+.day-planner-card:last-child {
+    border-bottom: none;
+}
+
+.day-planner-card:hover {
+    background-color: var(--secondary-light);
+    padding-left: 10px;
+    padding-right: 10px;
+}

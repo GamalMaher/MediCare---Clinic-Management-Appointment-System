@@ -1,0 +1,131 @@
+@model IEnumerable<Medicare.Models.MedicalRecord>
+@{
+    ViewData["Title"] = "السجل الطبي للمريض";
+}
+
+<div class="container mt-4 mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-primary fw-bold"><i class="bi bi-journal-medical me-2"></i> التاريخ والسجل الطبي</h2>
+        @if (User.IsInRole("Admin") || User.IsInRole("Doctor"))
+        {
+            <a asp-action="Create" asp-route-patientId="@ViewBag.PatientId" class="btn btn-success rounded-pill px-4 shadow-sm">
+                <i class="bi bi-plus-circle me-1"></i> إضافة تقرير طبي جديد
+            </a>
+        }
+    </div>
+
+    <div class="alert alert-info border-0 shadow-sm mb-4 text-center">
+        <h5 class="alert-heading mb-1"><i class="bi bi-person-badge"></i> المريض</h5>
+        <p class="mb-0 fw-bold fs-5 text-primary">@ViewBag.PatientName</p>
+    </div>
+
+    <!-- خط السجل الطبي (Timeline) -->
+    <div class="position-relative" dir="rtl" style="text-align: right;">
+        @if (!Model.Any())
+        {
+            <div class="card shadow border-0 rounded-lg p-5 text-center">
+                <i class="bi bi-folder-x" style="font-size: 3rem; color: #ccc;"></i>
+                <h5 class="text-muted mt-3">لا يوجد سجلات طبية مسجلة لهذا المريض حالياً</h5>
+            </div>
+        }
+        else
+        {
+            <!-- خط الوسط العمودي للجدول الزمني -->
+            <div class="position-absolute start-50 translate-x-50 h-100 d-none d-md-block" style="width: 3px; background-color: #dee2e6; right: 50%;"></div>
+
+            @foreach (var record in Model)
+            {
+                <div class="row mb-5 align-items-stretch">
+                    <!-- جهة اليسار: فارغة في الشاشات الكبيرة لوضع التناظر، أو التفاصيل -->
+                    <div class="col-md-5 d-none d-md-flex align-items-center justify-content-end text-end pe-4">
+                        <span class="text-muted fw-semibold">
+                            <i class="bi bi-calendar3"></i> @record.CreatedDate.ToString("yyyy-MM-dd") - الساعة @record.CreatedDate.ToString("hh:mm tt")
+                        </span>
+                    </div>
+
+                    <!-- عمود الأيقونة والخط الزمني -->
+                    <div class="col-md-2 d-none d-md-flex justify-content-center position-relative">
+                        <div class="avatar bg-primary text-white rounded-circle d-flex justify-content-center align-items-center z-1 shadow" style="width: 50px; height: 50px; border: 4px solid #fff; font-size: 1.2rem;">
+                            <i class="bi bi-file-earmark-medical-fill"></i>
+                        </div>
+                    </div>
+
+                    <!-- جهة اليمين: كارت التفاصيل الطبية للتشخيص -->
+                    <div class="col-md-5 col-12 ps-md-4">
+                        <div class="card shadow-sm border-0 border-start border-primary border-4 rounded-lg">
+                            <div class="card-header bg-white d-flex justify-content-between align-items-center border-0 pt-3">
+                                @if (record.Doctor != null)
+                                {
+                                    <h6 class="mb-0 fw-bold text-dark"><i class="bi bi-person-fill"></i> الطبيب المعالج: د. @record.Doctor.User.FirstName @record.Doctor.User.LastName</h6>
+                                }
+                                else
+                                {
+                                    <h6 class="mb-0 fw-bold text-dark"><i class="bi bi-person-fill"></i> نظام Medicare</h6>
+                                }
+                                <small class="text-muted d-md-none">@record.CreatedDate.ToString("yyyy-MM-dd")</small>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <span class="badge bg-primary px-3 py-1 rounded-pill mb-2">التشخيص (Diagnosis)</span>
+                                    <p class="fs-6 text-dark fw-semibold ps-2">@record.Diagnosis</p>
+                                </div>
+
+                                <div class="mb-3">
+                                    <span class="badge bg-info text-dark px-3 py-1 rounded-pill mb-2">العلاج والملاحظات (Treatment)</span>
+                                    <p class="fs-6 text-secondary ps-2 text-wrap">@record.Treatment</p>
+                                </div>
+
+                                <!-- الروشتة المرفقة -->
+                                @if (record.Prescriptions != null && record.Prescriptions.Any())
+                                {
+                                    <div class="mt-4 p-3 bg-light rounded shadow-sm border border-dashed">
+                                        <h6 class="fw-bold text-primary mb-3"><i class="bi bi-prescription2"></i> الروشتة الطبية المرفقة:</h6>
+                                        <div class="table-responsive">
+                                            <table class="table table-sm table-borderless align-middle mb-0 text-end">
+                                                <thead>
+                                                    <tr class="text-secondary border-bottom">
+                                                        <th scope="col" style="text-align: right;">الدواء</th>
+                                                        <th scope="col" style="text-align: right;">الجرعة</th>
+                                                        <th scope="col" style="text-align: right;">التكرار</th>
+                                                        <th scope="col" style="text-align: right;">المدة</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach (var p in record.Prescriptions)
+                                                    {
+                                                        <tr>
+                                                            <td class="fw-bold text-dark">@p.MedicationName</td>
+                                                            <td>@p.Dosage</td>
+                                                            <td>@p.Frequency</td>
+                                                            <td class="text-secondary fw-semibold">@p.DurationDays يوم</td>
+                                                        </tr>
+                                                    }
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                }
+
+                                <!-- المستندات والمرفقات الطبية -->
+                                @if (record.MedicalDocs != null && record.MedicalDocs.Any())
+                                {
+                                    <div class="mt-4">
+                                        <h6 class="fw-bold text-secondary mb-2"><i class="bi bi-paperclip"></i> المستندات والمرفقات الطبية:</h6>
+                                        <div class="d-flex flex-wrap gap-2">
+                                            @foreach (var doc in record.MedicalDocs)
+                                            {
+                                                <a href="@doc.FilePath" target="_blank" class="btn btn-outline-secondary btn-sm rounded-pill px-3 py-1 shadow-sm d-inline-flex align-items-center">
+                                                    <i class="bi bi-file-earmark-arrow-down-fill text-primary me-1"></i> @doc.FileName
+                                                </a>
+                                            }
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>

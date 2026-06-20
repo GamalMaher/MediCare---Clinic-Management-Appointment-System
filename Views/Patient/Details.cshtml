@@ -1,0 +1,52 @@
+@model PatientDetailViewModel
+@{
+    ViewData["Title"] = "تفاصيل المريض";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow border-0 rounded-lg">
+                <div class="card-header bg-info text-dark text-center py-4">
+                    <h3 class="font-weight-light my-1 fw-bold">الملف التعريفي للمريض</h3>
+                </div>
+                <div class="card-body p-5">
+                    <div class="text-center mb-4">
+                        <div class="avatar bg-info text-dark rounded-circle d-inline-flex justify-content-center align-items-center mb-3 shadow" style="width: 80px; height: 80px; font-weight: bold; font-size: 2rem;">
+                            @(Model.FirstName.Substring(0, 1) + Model.LastName.Substring(0, 1))
+                        </div>
+                        <h3 class="fw-bold">@Model.FirstName @Model.LastName</h3>
+                        <span class="badge bg-danger text-white px-3 py-2 rounded-pill fs-6 mt-1">فصيلة الدم: @Model.BloodType</span>
+                    </div>
+
+                    <hr />
+
+                    <div class="row mt-4">
+                        <div class="col-sm-4 fw-bold text-secondary mb-2">رقم الهاتف:</div>
+                        <div class="col-sm-8 mb-2">@Model.PhoneNumber</div>
+
+                        <div class="col-sm-4 fw-bold text-secondary mb-2">تاريخ الميلاد:</div>
+                        <div class="col-sm-8 mb-2">@Model.DateOfBirth.ToString("yyyy-MM-dd")</div>
+
+                        <div class="col-sm-4 fw-bold text-secondary mb-2">الحساسية والأمراض المزمنة:</div>
+                        <div class="col-sm-8 mb-2 text-wrap">
+                            @if (string.IsNullOrWhiteSpace(Model.Allergies))
+                            {
+                                <span class="text-muted">لا يوجد</span>
+                            }
+                            else
+                            {
+                                <span class="text-danger">@Model.Allergies</span>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-center gap-3 mt-5">
+                        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning px-4 btn-lg rounded-pill shadow-sm">تعديل الملف</a>
+                        <a asp-action="Index" class="btn btn-outline-secondary px-4 btn-lg rounded-pill">العودة للقائمة</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

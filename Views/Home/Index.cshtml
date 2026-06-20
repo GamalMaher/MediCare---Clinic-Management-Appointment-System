@@ -1,0 +1,86 @@
+@{
+    ViewData["Title"] = "الرئيسية - بوابة Medicare الطبية";
+}
+
+<div class="portal-hero text-center mb-5">
+    <div class="container">
+        <h1 class="portal-title mb-3">مرحباً بك في منصة <span>Medicare</span> الرقمية</h1>
+        <p class="fs-5 text-muted mx-auto" style="max-width: 700px;">
+            نظام حجز مواعيد ذكي ومتكامل يربط بين المرضى وأكفأ الأطباء لتوفير رعاية صحية مريحة وفورية. اختر بوابتك للبدء:
+        </p>
+    </div>
+</div>
+
+<div class="container mb-5">
+    <div class="row justify-content-center g-4">
+        <!-- بوابة المرضى -->
+        <div class="col-md-5">
+            <div class="portal-card h-100 d-flex flex-column justify-content-between">
+                <div>
+                    <div class="portal-icon-wrapper">
+                        <i class="bi bi-person-heart"></i>
+                    </div>
+                    <h3 class="fw-bold mb-3">بوابة المرضى</h3>
+                    <p class="text-muted mb-4">
+                        احجز موعداً مع طبيبك المفضل، تابع حالة طلباتك، استعرض سجلك الطبي والتقارير الطبية، وقم بتقييم الأطباء بعد انتهاء زيارتك.
+                    </p>
+                </div>
+                <div class="d-flex flex-column gap-2 mt-4">
+                    <a asp-controller="Account" asp-action="Login" class="med-btn med-btn-primary w-100 py-3 fs-6">
+                        <i class="bi bi-box-arrow-in-left me-1"></i> تسجيل الدخول كمريض
+                    </a>
+                    <a asp-controller="Account" asp-action="Register" class="med-btn med-btn-outline w-100 py-3 fs-6">
+                        <i class="bi bi-person-plus me-1"></i> إنشاء حساب مريض جديد
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- بوابة الأطباء -->
+        <div class="col-md-5">
+            <div class="portal-card h-100 d-flex flex-column justify-content-between">
+                <div>
+                    <div class="portal-icon-wrapper" style="background-color: #f0fdfa; color: #0d9488;">
+                        <i class="bi bi-person-workspace"></i>
+                    </div>
+                    <h3 class="fw-bold mb-3">بوابة الأطباء</h3>
+                    <p class="text-muted mb-4">
+                        تتبع جدول مواعيد العيادة الشهري الخاص بك، حدد أوقات فراغك وتواجدك المتاحة للحجز، واطلع على السجل المرضي وعدد زيارات المرضى السابقة.
+                    </p>
+                </div>
+                <div class="d-flex flex-column gap-2 mt-4">
+                    <a asp-controller="Account" asp-action="Login" class="med-btn med-btn-secondary w-100 py-3 fs-6">
+                        <i class="bi bi-box-arrow-in-left me-1"></i> تسجيل الدخول كطبيب
+                    </a>
+                    <div class="text-muted py-2 small">
+                        * يتم تسجيل حسابات الأطباء من قِبل إدارة المستشفى.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- قسم تعريفي بسيط ومريح حول كيفية العمل -->
+<div class="container mt-5 py-4">
+    <div class="med-card p-4 bg-light border-0 text-center">
+        <h4 class="fw-bold mb-4 text-secondary">كيف تعمل منصة Medicare في 3 خطوات؟</h4>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="fs-1 text-primary mb-2"><i class="bi bi-search"></i></div>
+                <h5 class="fw-bold">1. ابحث عن طبيبك</h5>
+                <p class="text-muted small mb-0">ابحث بمرضك أو الأعراض لتجد الدكتور المتخصص المناسب لك.</p>
+            </div>
+            <div class="col-md-4">
+                <div class="fs-1 text-primary mb-2"><i class="bi bi-calendar-check"></i></div>
+                <h5 class="fw-bold">2. اختر الموعد المناسب</h5>
+                <p class="text-muted small mb-0">اختر التاريخ والوقت المفضلين لديك من جدول الطبيب المتاح.</p>
+            </div>
+            <div class="col-md-4">
+                <div class="fs-1 text-primary mb-2"><i class="bi bi-clipboard-pulse"></i></div>
+                <h5 class="fw-bold">3. استشر طبيبك وقيم زيارتك</h5>
+                <p class="text-muted small mb-0">احصل على كشفك، تابع تقريرك الطبي وسجل تقييمك لمستوى الخدمة.</p>
+            </div>
+        </div>
+    </div>
+</div>

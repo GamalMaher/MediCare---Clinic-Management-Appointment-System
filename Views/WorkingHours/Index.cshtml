@@ -1,0 +1,91 @@
+@model IEnumerable<Medicare.Models.WorkingHours>
+@{
+    ViewData["Title"] = "أوقات تواجد الطبيب المتاحة";
+    var dayNames = ViewBag.DayNames as Dictionary<DayOfWeek, string>;
+}
+
+<div class="container mt-4 mb-5 text-end">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <!-- الهيدر وبوتون التعديل -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="text-primary fw-bold mb-1"><i class="bi bi-clock me-2"></i> أوقات تواجدي المتاحة</h2>
+                    <p class="text-muted mb-0">يمكن للمرضى حجز المواعيد فقط خلال الأوقات المحددة أدناه.</p>
+                </div>
+                <a asp-action="Edit" asp-route-doctorId="@ViewBag.DoctorId" class="med-btn med-btn-primary shadow-sm">
+                    <i class="bi bi-pencil-square"></i> تعديل أوقات العمل
+                </a>
+            </div>
+
+            <!-- بطاقة الطبيب الملونة الترحيبية -->
+            <div class="med-card p-4 mb-4 border-0 bg-light">
+                <div class="d-flex align-items-center">
+                    <div class="med-avatar me-3">
+                        <i class="bi bi-person-workspace"></i>
+                    </div>
+                    <div class="me-3">
+                        <span class="text-muted small">الطبيب المعالج:</span>
+                        <h5 class="fw-bold text-dark mt-1">@ViewBag.DoctorName</h5>
+                    </div>
+                </div>
+            </div>
+
+            <!-- قائمة عرض مخطط الأيام -->
+            <div class="med-card shadow-sm border-0 p-4">
+                <h5 class="fw-bold mb-4 text-secondary"><i class="bi bi-calendar-check me-1 text-primary"></i> المخطط الأسبوعي للمواعيد:</h5>
+                
+                <div class="d-flex flex-column">
+                    @foreach (DayOfWeek day in Enum.GetValues(typeof(DayOfWeek)))
+                    {
+                        var matched = Model.FirstOrDefault(h => h.DayOfWeek == day);
+                        
+                        <div class="day-planner-card d-flex flex-column flex-sm-row justify-content-between align-items-sm-center py-3 border-bottom">
+                            <!-- اليوم والاسم -->
+                            <div class="d-flex align-items-center mb-2 mb-sm-0">
+                                <span class="fs-5 fw-bold text-secondary" style="min-width: 100px;">@dayNames[day]</span>
+                                @if (matched != null)
+                                {
+                                    <span class="med-badge med-badge-success ms-2"><i class="bi bi-check-circle-fill"></i> متاح للعمل</span>
+                                }
+                                else
+                                {
+                                    <span class="med-badge med-badge-danger ms-2"><i class="bi bi-x-circle-fill"></i> عطلة نهاية الأسبوع</span>
+                                }
+                            </div>
+
+                            <!-- الساعات المتاحة -->
+                            <div class="d-flex align-items-center gap-3">
+                                @if (matched != null)
+                                {
+                                    <div class="text-secondary fw-semibold">
+                                        <i class="bi bi-door-open text-primary"></i> من الساعة <span class="badge bg-light text-dark border px-2 py-1 fs-6">@matched.StartTime.ToString(@"hh\:mm")</span>
+                                    </div>
+                                    <div class="text-secondary fw-semibold">
+                                        إلى الساعة <span class="badge bg-light text-dark border px-2 py-1 fs-6">@matched.EndTime.ToString(@"hh\:mm")</span>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <span class="text-muted small"><i class="bi bi-moon-stars me-1"></i> العيادة مغلقة</span>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+            
+            <!-- أزرار التوجيه في الأسفل -->
+            <div class="mt-4 text-center">
+                @if (User.IsInRole("Admin"))
+                {
+                    <a asp-controller="Doctor" asp-action="Index" class="med-btn med-btn-outline px-4">العودة لقائمة الأطباء</a>
+                }
+                else
+                {
+                    <a asp-controller="Appointment" asp-action="DoctorAppointments" class="med-btn med-btn-outline px-4">العودة لمواعيد العيادة</a>
+                }
+            </div>
+        </div>
+    </div>
+</div>

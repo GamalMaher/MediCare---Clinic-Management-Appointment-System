@@ -1,0 +1,117 @@
+@model RegisterViewModel
+@{
+    ViewData["Title"] = "إنشاء حساب مريض جديد - Medicare";
+}
+
+<div class="container text-end" style="margin-top: 3rem; margin-bottom: 5rem;">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="med-card shadow-lg border-0">
+                <div class="med-card-header text-center py-4 bg-success">
+                    <div class="fs-1 text-white mb-2"><i class="bi bi-person-plus-fill"></i></div>
+                    <h3 class="my-1 text-white fw-bold">إنشاء حساب مريض جديد</h3>
+                    <p class="text-white-50 mb-0 small">سجل معنا الآن لتتمكن من حجز مواعيد الأطباء فوراً ومتابعة حالتك</p>
+                </div>
+                <div class="card-body p-4 p-md-5" dir="rtl">
+                    <form asp-action="Register" method="post">
+                        @Html.AntiForgeryToken()
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-4 small"></div>
+
+                        <!-- الحقل الخفي لتحديد نوع المستخدم كمريض -->
+                        <input type="hidden" asp-for="Role" value="Patient" />
+
+                        <!-- القسم الأول: البيانات الشخصية -->
+                        <h6 class="fw-bold text-primary mb-3 border-bottom pb-2"><i class="bi bi-person-badge"></i> البيانات الشخصية الأساسية</h6>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label asp-for="FirstName" class="form-label fw-bold text-secondary mb-1">الاسم الأول</label>
+                                <input asp-for="FirstName" class="form-control med-input" placeholder="مثال: أحمد" />
+                                <span asp-validation-for="FirstName" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="LastName" class="form-label fw-bold text-secondary mb-1">الاسم الأخير</label>
+                                <input asp-for="LastName" class="form-control med-input" placeholder="مثال: محمد" />
+                                <span asp-validation-for="LastName" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <!-- القسم الثاني: الاتصال والتوثيق -->
+                        <h6 class="fw-bold text-primary mb-3 border-bottom pb-2"><i class="bi bi-shield-lock"></i> بيانات الاتصال والحساب</h6>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label asp-for="Email" class="form-label fw-bold text-secondary mb-1">البريد الإلكتروني</label>
+                                <input asp-for="Email" class="form-control med-input" placeholder="name@example.com" />
+                                <span asp-validation-for="Email" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="Phone" class="form-label fw-bold text-secondary mb-1">رقم الهاتف</label>
+                                <input asp-for="Phone" class="form-control med-input" placeholder="01xxxxxxxxx" />
+                                <span asp-validation-for="Phone" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label asp-for="Password" class="form-label fw-bold text-secondary mb-1">كلمة المرور</label>
+                                <input asp-for="Password" class="form-control med-input" type="password" placeholder="••••••••" />
+                                <span asp-validation-for="Password" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="ConfirmPassword" class="form-label fw-bold text-secondary mb-1">تأكيد كلمة المرور</label>
+                                <input asp-for="ConfirmPassword" class="form-control med-input" type="password" placeholder="••••••••" />
+                                <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <!-- القسم الثالث: البيانات الطبية -->
+                        <h6 class="fw-bold text-primary mb-3 border-bottom pb-2"><i class="bi bi-clipboard-pulse"></i> البيانات الصحية الإضافية</h6>
+                        <div class="card p-4 mb-4 bg-light border-0" style="border-radius: 12px;">
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-4">
+                                    <label asp-for="Gender" class="form-label fw-bold text-secondary mb-1">الجنس</label>
+                                    <select asp-for="Gender" class="form-select med-input" style="height: 48px; border: 2px solid #e2e8f0; background-position: left 0.75rem center;">
+                                        <option value="Male">ذكر</option>
+                                        <option value="Female">أنثى</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label asp-for="BloodType" class="form-label fw-bold text-secondary mb-1">فصيلة الدم</label>
+                                    <input asp-for="BloodType" class="form-control med-input" placeholder="مثال: O+" />
+                                </div>
+                                <div class="col-md-4">
+                                    <label asp-for="DateOfBirth" class="form-label fw-bold text-secondary mb-1">تاريخ الميلاد</label>
+                                    <input asp-for="DateOfBirth" type="date" class="form-control med-input" style="height: 48px;" />
+                                </div>
+                            </div>
+                            <div>
+                                <label asp-for="Allergies" class="form-label fw-bold text-secondary mb-1">الأمراض المزمنة أو الحساسية (إن وجدت)</label>
+                                <textarea asp-for="Allergies" class="form-control med-input" rows="2" placeholder="مثال: حساسية البنسلين، مرض السكر..."></textarea>
+                            </div>
+                        </div>
+
+                        <!-- أزرار الإرسال -->
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="med-btn med-btn-primary py-3 fs-6 w-100">
+                                <i class="bi bi-person-plus-fill"></i> إنشاء حساب مريض جديد
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- فوتر البطاقة -->
+                <div class="card-footer text-center py-3 bg-light border-0">
+                    <div class="small text-muted">
+                        لديك حساب بالفعل؟ <a asp-action="Login" class="text-primary fw-bold text-decoration-none">سجل دخولك هنا</a>
+                    </div>
+                    <div class="small text-muted mt-1">
+                        <a asp-controller="Home" asp-action="Index" class="text-secondary text-decoration-none"><i class="bi bi-house-door"></i> العودة للرئيسية</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

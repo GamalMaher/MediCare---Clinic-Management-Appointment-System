@@ -1,0 +1,65 @@
+@model LoginViewModel
+@{
+    ViewData["Title"] = "تسجيل الدخول - Medicare";
+}
+
+<div class="container text-end" style="margin-top: 4rem; margin-bottom: 5rem;">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div class="med-card shadow-lg border-0">
+                <div class="med-card-header text-center py-4 bg-primary">
+                    <div class="fs-1 text-white mb-2"><i class="bi bi-heart-pulse-fill"></i></div>
+                    <h3 class="my-1 text-white fw-bold">Medicare</h3>
+                    <p class="text-white-50 mb-0 small">بوابة الوصول الموحد للأطباء والمرضى</p>
+                </div>
+                <div class="card-body p-4 p-md-5" dir="rtl">
+                    <form asp-action="Login" method="post">
+                        @Html.AntiForgeryToken()
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3 small"></div>
+
+                        <!-- البريد الإلكتروني -->
+                        <div class="mb-4">
+                            <label asp-for="Email" class="form-label fw-bold text-secondary mb-2"><i class="bi bi-envelope text-primary me-1"></i> البريد الإلكتروني</label>
+                            <input asp-for="Email" class="form-control med-input" placeholder="name@example.com" autofocus />
+                            <span asp-validation-for="Email" class="text-danger small"></span>
+                        </div>
+
+                        <!-- كلمة المرور -->
+                        <div class="mb-4">
+                            <label asp-for="Password" class="form-label fw-bold text-secondary mb-2"><i class="bi bi-lock text-primary me-1"></i> كلمة المرور</label>
+                            <input asp-for="Password" class="form-control med-input" type="password" placeholder="••••••••" />
+                            <span asp-validation-for="Password" class="text-danger small"></span>
+                        </div>
+
+                        <!-- تذكرني -->
+                        <div class="mb-4 form-check d-flex align-items-center gap-2">
+                            <input asp-for="RememberMe" class="form-check-input ms-0 float-end" style="cursor: pointer;" />
+                            <label asp-for="RememberMe" class="form-check-label text-muted small cursor-pointer" style="margin-right: 0.5rem;">تذكرني على هذا الجهاز</label>
+                        </div>
+
+                        <!-- زر الإرسال -->
+                        <div class="d-grid gap-2 mb-3">
+                            <button type="submit" class="med-btn med-btn-primary w-100 py-3 fs-6">
+                                <i class="bi bi-box-arrow-in-left me-1"></i> تسجيل الدخول
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- الفوتر الخاص بالبطاقة -->
+                <div class="card-footer text-center py-3 bg-light border-0">
+                    <div class="small text-muted">
+                        مريض جديد؟ <a asp-action="Register" class="text-primary fw-bold text-decoration-none">سجل حساباً هنا!</a>
+                    </div>
+                    <div class="small text-muted mt-1">
+                        <a asp-controller="Home" asp-action="Index" class="text-secondary text-decoration-none"><i class="bi bi-house-door"></i> العودة للرئيسية</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

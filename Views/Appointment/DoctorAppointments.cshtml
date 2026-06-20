@@ -1,0 +1,434 @@
+@model IEnumerable<Medicare.Models.Appointment>
+@{
+    ViewData["Title"] = "تقويم مواعيد العيادة";
+}
+
+<div class="container mt-4 mb-5 text-end">
+    <!-- عنوان لوحة التحكم وأزرار التبديل -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+        <div>
+            <h2 class="text-primary fw-bold mb-1"><i class="bi bi-calendar3 me-2"></i> لوحة مواعيد العيادة</h2>
+            <p class="text-muted mb-0">تابع مواعيد المرضى المحجوزة، واطلع على السجلات الطبية والتحليلات الخاصة بهم.</p>
+        </div>
+        
+        <div class="d-flex align-items-center gap-3">
+            <a asp-controller="WorkingHours" asp-action="Index" class="med-btn med-btn-outline btn-sm py-2 px-3">
+                <i class="bi bi-clock-history"></i> ضبط أوقاتي المتاحة
+            </a>
+            
+            <div class="btn-group shadow-sm rounded-pill bg-white p-1" role="group" aria-label="View Toggle" style="border: 1px solid #e2e8f0;">
+                <button type="button" class="btn btn-sm rounded-pill px-4 py-2 text-primary border-0 active-btn" id="btn-calendar" onclick="switchView('calendar')">
+                    <i class="bi bi-calendar-week me-1"></i> التقويم الشهري
+                </button>
+                <button type="button" class="btn btn-sm rounded-pill px-4 py-2 text-secondary border-0" id="btn-list" onclick="switchView('list')">
+                    <i class="bi bi-list-task me-1"></i> جدول المواعيد
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 1. واجهة عرض التقويم -->
+    <div id="view-calendar" class="med-card shadow-sm border-0 p-4 mb-4">
+        <div id="calendar" class="fc-rtl"></div>
+    </div>
+
+    <!-- 2. واجهة عرض الجدول -->
+    <div id="view-list" class="med-table-container d-none mb-4">
+        <table class="table med-table table-hover align-middle">
+            <thead>
+                <tr>
+                    <th scope="col">المريض</th>
+                    <th scope="col">التاريخ والوقت</th>
+                    <th scope="col">السبب أو الأعراض</th>
+                    <th scope="col">الحالة</th>
+                    <th scope="col" class="text-center">الإجراءات والتحكم</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="5" class="text-center py-5 text-muted">
+                            <i class="bi bi-calendar-x" style="font-size: 3rem; color: #ccc;"></i>
+                            <h5 class="my-3">لا توجد مواعيد محجوزة لدى عيادتك حالياً</h5>
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="med-avatar med-avatar-patient me-3">
+                                        @(item.Patient.User.FirstName.Substring(0, 1) + item.Patient.User.LastName.Substring(0, 1))
+                                    </div>
+                                    <div class="me-3">
+                                        <h6 class="mb-0 fw-bold text-dark">@item.Patient.User.FirstName @item.Patient.User.LastName</h6>
+                                        <small class="text-muted">الهاتف: @item.Patient.PhoneNumber</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="fw-bold text-secondary">@item.AppointmentDate.ToString("yyyy-MM-dd")</div>
+                                <div class="small text-muted"><i class="bi bi-clock"></i> الساعة @item.StartTime.ToString(@"hh\:mm")</div>
+                            </td>
+                            <td>
+                                <span class="text-muted text-wrap d-inline-block" style="max-width: 250px;" title="@item.Reason">
+                                    @(string.IsNullOrWhiteSpace(item.Reason) ? "استشارة طبية عامة" : item.Reason)
+                                </span>
+                            </td>
+                            <td>
+                                @switch (item.Status)
+                                {
+                                    case Medicare.Models.AppointmentStatus.Pending:
+                                        <span class="med-badge med-badge-warning"><i class="bi bi-clock me-1"></i> قيد الانتظار</span>
+                                        break;
+                                    case Medicare.Models.AppointmentStatus.Confirmed:
+                                        <span class="med-badge med-badge-primary"><i class="bi bi-check-circle me-1"></i> مؤكد</span>
+                                        break;
+                                    case Medicare.Models.AppointmentStatus.Completed:
+                                        <span class="med-badge med-badge-success"><i class="bi bi-check-all me-1"></i> مكتمل</span>
+                                        break;
+                                    case Medicare.Models.AppointmentStatus.Cancelled:
+                                        <span class="med-badge med-badge-danger"><i class="bi bi-x-circle me-1"></i> ملغى</span>
+                                        break;
+                                }
+                            </td>
+                            <td>
+                                <div class="d-flex justify-content-center gap-2 flex-wrap">
+                                    <!-- زر فتح ملخص الموعد المنبثق -->
+                                    <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-3 py-1 fs-7" 
+                                            onclick="openModalFromList('@item.Id', '@(item.Patient.User.FirstName) @(item.Patient.User.LastName)', @item.PatientId, '@(item.AppointmentDate.ToString("yyyy-MM-dd"))T@(item.StartTime.ToString(@"hh\:mm\:ss"))', '@item.AppointmentDate.ToString("yyyy-MM-dd")', '@item.StartTime.ToString(@"hh\:mm")', '@(Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(item.Reason ?? "فحص طبي")))', '@item.Status.ToString()')">
+                                        <i class="bi bi-card-text"></i> ملخص الكشف
+                                    </button>
+
+                                    <a asp-controller="MedicalRecord" asp-action="PatientHistory" asp-route-patientId="@item.PatientId" class="btn btn-outline-info btn-sm px-3 rounded-pill fs-7"><i class="bi bi-file-earmark-medical"></i> السجل الكامل</a>
+                                    
+                                    @if (item.Status == Medicare.Models.AppointmentStatus.Pending)
+                                    {
+                                        <form asp-action="UpdateStatus" method="post" class="d-inline">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@item.Id" />
+                                            <input type="hidden" name="status" value="@Medicare.Models.AppointmentStatus.Confirmed" />
+                                            <button type="submit" class="btn btn-success btn-sm px-3 rounded-pill fs-7">قبول</button>
+                                        </form>
+                                        <form asp-action="UpdateStatus" method="post" class="d-inline">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@item.Id" />
+                                            <input type="hidden" name="status" value="@Medicare.Models.AppointmentStatus.Cancelled" />
+                                            <button type="submit" class="btn btn-outline-danger btn-sm px-3 rounded-pill fs-7">رفض</button>
+                                        </form>
+                                    }
+                                    else if (item.Status == Medicare.Models.AppointmentStatus.Confirmed)
+                                    {
+                                        <form asp-action="UpdateStatus" method="post" class="d-inline">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@item.Id" />
+                                            <input type="hidden" name="status" value="@Medicare.Models.AppointmentStatus.Completed" />
+                                            <button type="submit" class="btn btn-success btn-sm px-3 rounded-pill fs-7"><i class="bi bi-check-lg"></i> إتمام الفحص</button>
+                                        </form>
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- نافذة التفاصيل المنبثقة (Modal) للتقويم والجدول مع جلب السجل الطبي ديناميكياً -->
+<div class="modal fade" id="appointmentModal" tabindex="-1" aria-labelledby="appointmentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 16px;">
+            <div class="modal-header bg-primary text-white" style="border-top-left-radius: 16px; border-top-right-radius: 16px;">
+                <h5 class="modal-title fw-bold" id="appointmentModalLabel"><i class="bi bi-clipboard-pulse me-1"></i> تفاصيل وموجز موعد المريض</h5>
+                <button type="button" class="btn-close btn-close-white ms-0 me-auto" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4 text-end" dir="rtl">
+                <!-- بيانات المريض الحالية -->
+                <div class="mb-3">
+                    <span class="text-secondary fw-bold small"><i class="bi bi-person"></i> اسم المريض:</span>
+                    <h5 id="modalPatientName" class="fw-bold text-dark mt-1"></h5>
+                </div>
+                <div class="mb-3">
+                    <span class="text-secondary fw-bold small"><i class="bi bi-calendar-event"></i> تاريخ الموعد والوقت:</span>
+                    <p id="modalDateTime" class="fs-6 mt-1 mb-0 text-secondary fw-semibold"></p>
+                </div>
+                <div class="mb-3">
+                    <span class="text-secondary fw-bold small"><i class="bi bi-chat-right-text"></i> سبب الزيارة:</span>
+                    <p id="modalReason" class="fs-6 mt-1 text-muted bg-light p-2 rounded"></p>
+                </div>
+                <div class="mb-3">
+                    <span class="text-secondary fw-bold small"><i class="bi bi-flag"></i> حالة الحجز الحالية:</span>
+                    <div id="modalStatusContainer" class="mt-1"></div>
+                </div>
+                
+                <hr class="my-4" />
+
+                <!-- السجل المرضي وعدد الزيارات السابقة (جلب ديناميكي عبر AJAX) -->
+                <div class="mb-4">
+                    <span class="text-secondary fw-bold small"><i class="bi bi-shield-check"></i> ملخص زيارات المريض للمستشفى:</span>
+                    <div id="modalVisitCount" class="mt-2"></div>
+                </div>
+                <div class="mb-4">
+                    <span class="text-secondary fw-bold small"><i class="bi bi-file-earmark-medical-fill"></i> السجل المرضي وتفاصيل آخر تشخيص:</span>
+                    <div id="modalMedicalHistory" class="mt-2"></div>
+                </div>
+
+                <div class="d-flex justify-content-start gap-2 mt-4 pt-3 border-top" id="modalActions">
+                    <!-- أزرار الإجراءات للتقويم -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- FullCalendar JS v6 -->
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+    
+    <script>
+        // إعداد المواعيد القادمة من السيرفر كـ JSON للتقويم
+        var rawEvents = [
+            @foreach (var app in Model)
+            {
+                <text>
+                {
+                    id: '@app.Id',
+                    title: 'مريض: @(app.Patient.User.FirstName) @(app.Patient.User.LastName)',
+                    patientName: '@(app.Patient.User.FirstName) @(app.Patient.User.LastName)',
+                    patientId: @app.PatientId,
+                    start: '@(app.AppointmentDate.ToString("yyyy-MM-dd"))T@(app.StartTime.ToString(@"hh\:mm\:ss"))',
+                    dateString: '@app.AppointmentDate.ToString("yyyy-MM-dd")',
+                    timeString: '@app.StartTime.ToString(@"hh\:mm")',
+                    reason: '@(Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(app.Reason ?? "استشارة طبية عامة")))',
+                    status: '@app.Status.ToString()',
+                    statusCode: @((int)app.Status),
+                    color: '@(app.Status == Medicare.Models.AppointmentStatus.Pending ? "#f59e0b" : app.Status == Medicare.Models.AppointmentStatus.Confirmed ? "#0d9488" : app.Status == Medicare.Models.AppointmentStatus.Completed ? "#10b981" : "#ef4444")',
+                    textColor: '#ffffff'
+                },
+                </text>
+            }
+        ];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            var calendarEl = document.getElementById('calendar');
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                locale: 'ar', // عرض باللغة العربية
+                direction: 'rtl',
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                },
+                buttonText: {
+                    today: 'اليوم',
+                    month: 'شهر',
+                    week: 'أسبوع',
+                    day: 'يوم'
+                },
+                events: rawEvents,
+                eventClick: function(info) {
+                    showAppointmentModal(info.event);
+                }
+            });
+            calendar.render();
+            
+            // تخزين التقويم لإعادة رسمه عند تغيير العرض
+            window.calendarInstance = calendar;
+        });
+
+        // تبديل عرض لوحة التحكم بين التقويم والجدول
+        function switchView(viewType) {
+            const btnCal = document.getElementById('btn-calendar');
+            const btnLst = document.getElementById('btn-list');
+            
+            if (viewType === 'calendar') {
+                document.getElementById('view-calendar').classList.remove('d-none');
+                document.getElementById('view-list').classList.add('d-none');
+                
+                btnCal.classList.add('text-primary', 'active-btn');
+                btnCal.classList.remove('text-secondary');
+                btnLst.classList.remove('text-primary', 'active-btn');
+                btnLst.classList.add('text-secondary');
+                
+                if (window.calendarInstance) {
+                    window.calendarInstance.updateSize();
+                }
+            } else {
+                document.getElementById('view-calendar').classList.add('d-none');
+                document.getElementById('view-list').classList.remove('d-none');
+                
+                btnLst.classList.add('text-primary', 'active-btn');
+                btnLst.classList.remove('text-secondary');
+                btnCal.classList.remove('text-primary', 'active-btn');
+                btnCal.classList.add('text-secondary');
+            }
+        }
+
+        // فتح المودال من الجدول
+        function openModalFromList(id, patientName, patientId, startDateTime, dateString, timeString, reason, status) {
+            var dummyEvent = {
+                id: id,
+                start: new Date(startDateTime),
+                extendedProps: {
+                    patientName: patientName,
+                    patientId: patientId,
+                    timeString: timeString,
+                    reason: reason,
+                    status: status
+                }
+            };
+            showAppointmentModal(dummyEvent);
+        }
+
+        // عرض تفاصيل المريض في المودال مع جلب ملخص السجل الطبي ديناميكياً
+        function showAppointmentModal(event) {
+            var props = event.extendedProps;
+            
+            document.getElementById('modalPatientName').innerText = props.patientName;
+            
+            // ضبط صيغة التاريخ والوقت
+            var dateOpts = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            var formattedDate = "";
+            if (event.start instanceof Date) {
+                formattedDate = event.start.toLocaleDateString('ar-EG', dateOpts);
+            } else {
+                formattedDate = new Date(event.start).toLocaleDateString('ar-EG', dateOpts);
+            }
+            document.getElementById('modalDateTime').innerHTML = `<i class="bi bi-calendar-check text-primary"></i> ${formattedDate} - الساعة ${props.timeString}`;
+            document.getElementById('modalReason').innerText = props.reason || "استشارة عامة";
+            
+            // إظهار شارة الحالة المناسبة
+            var statusHtml = '';
+            var badgeClass = '';
+            var statusText = '';
+            
+            switch(props.status) {
+                case 'Pending':
+                    statusText = 'قيد الانتظار';
+                    badgeClass = 'med-badge-warning';
+                    break;
+                case 'Confirmed':
+                    statusText = 'مؤكد';
+                    badgeClass = 'med-badge-primary';
+                    break;
+                case 'Completed':
+                    statusText = 'مكتمل';
+                    badgeClass = 'med-badge-success';
+                    break;
+                case 'Cancelled':
+                    statusText = 'ملغى';
+                    badgeClass = 'med-badge-danger';
+                    break;
+            }
+            
+            document.getElementById('modalStatusContainer').innerHTML = `<span class="med-badge ${badgeClass} fs-6">${statusText}</span>`;
+            
+            // 1. عرض لودر أثناء تحميل البيانات
+            document.getElementById('modalVisitCount').innerHTML = `
+                <div class="text-muted small"><span class="spinner-border spinner-border-sm text-primary me-1" role="status"></span> جاري استخراج عدد الزيارات...</div>
+            `;
+            document.getElementById('modalMedicalHistory').innerHTML = `
+                <div class="text-muted small"><span class="spinner-border spinner-border-sm text-primary me-1" role="status"></span> جاري استخراج السجل المرضي...</div>
+            `;
+
+            // 2. جلب بيانات السجل والزيارات من الـ API الجديد
+            fetch(`/Appointment/GetPatientSummary?patientId=${props.patientId}`)
+                .then(response => {
+                    if (!response.ok) throw new Error("فشل الاتصال بالخادم");
+                    return response.json();
+                })
+                .then(data => {
+                    // تحديث عدد الزيارات
+                    let badgeVisits = data.visitCount > 0 ? "med-badge-success" : "med-badge-primary";
+                    document.getElementById('modalVisitCount').innerHTML = `
+                        <div class="med-badge ${badgeVisits} fs-6 px-3 py-2">
+                            <i class="bi bi-arrow-repeat"></i> المريض قام بـ <strong>${data.visitCount}</strong> زيارة سابقة مكتملة للمستشفى
+                        </div>
+                    `;
+                    
+                    // تحديث السجل المرضي الأخير
+                    document.getElementById('modalMedicalHistory').innerHTML = `
+                        <div class="card p-3 bg-light border-0 text-end">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="fw-bold text-secondary small"><i class="bi bi-clipboard-pulse"></i> آخر تشخيص تم تسجيله:</span>
+                                <span class="small text-muted">${data.latestRecordDate || 'لا يوجد تاريخ'}</span>
+                            </div>
+                            <p class="mb-2 fw-semibold text-dark fs-6">${data.latestDiagnosis}</p>
+                            <span class="fw-bold text-secondary small"><i class="bi bi-capsule"></i> العلاج والوصفة الطبية الأخيرة:</span>
+                            <p class="mb-0 text-muted small">${data.latestTreatment}</p>
+                        </div>
+                    `;
+                })
+                .catch(err => {
+                    document.getElementById('modalVisitCount').innerHTML = `<span class="text-danger small">عفواً، فشل تحميل الإحصائيات.</span>`;
+                    document.getElementById('modalMedicalHistory').innerHTML = `<span class="text-danger small">عفواً، فشل تحميل السجل الطبي.</span>`;
+                    console.error(err);
+                });
+
+            // 3. تجهيز أزرار التحكم
+            var actionsHtml = '';
+            var tokenElement = document.querySelector('input[name="__RequestVerificationToken"]');
+            var token = tokenElement ? tokenElement.value : "";
+            
+            // أزرار التحكم بالسجلات المتاحة دائماً
+            actionsHtml += `
+                <a href="/MedicalRecord/PatientHistory?patientId=${props.patientId}" class="btn btn-outline-info rounded-pill px-3 btn-sm"><i class="bi bi-file-earmark-medical"></i> السجل الكامل</a>
+                <a href="/MedicalRecord/Create?patientId=${props.patientId}" class="btn btn-outline-success rounded-pill px-3 btn-sm"><i class="bi bi-plus-circle"></i> تقرير طبي جديد</a>
+            `;
+
+            if (props.status === 'Pending') {
+                actionsHtml += `
+                    <form action="/Appointment/UpdateStatus" method="post" class="d-inline">
+                        <input type="hidden" name="__RequestVerificationToken" value="${token}" />
+                        <input type="hidden" name="id" value="${event.id}" />
+                        <input type="hidden" name="status" value="Confirmed" />
+                        <button type="submit" class="btn btn-success btn-sm rounded-pill px-3">قبول الموعد</button>
+                    </form>
+                    <form action="/Appointment/UpdateStatus" method="post" class="d-inline">
+                        <input type="hidden" name="__RequestVerificationToken" value="${token}" />
+                        <input type="hidden" name="id" value="${event.id}" />
+                        <input type="hidden" name="status" value="Cancelled" />
+                        <button type="submit" class="btn btn-outline-danger btn-sm rounded-pill px-3">رفض الموعد</button>
+                    </form>
+                `;
+            } else if (props.status === 'Confirmed') {
+                actionsHtml += `
+                    <form action="/Appointment/UpdateStatus" method="post" class="d-inline">
+                        <input type="hidden" name="__RequestVerificationToken" value="${token}" />
+                        <input type="hidden" name="id" value="${event.id}" />
+                        <input type="hidden" name="status" value="Completed" />
+                        <button type="submit" class="btn btn-success btn-sm rounded-pill px-3">إتمام الفحص</button>
+                    </form>
+                    <form action="/Appointment/UpdateStatus" method="post" class="d-inline">
+                        <input type="hidden" name="__RequestVerificationToken" value="${token}" />
+                        <input type="hidden" name="id" value="${event.id}" />
+                        <input type="hidden" name="status" value="Cancelled" />
+                        <button type="submit" class="btn btn-outline-danger btn-sm rounded-pill px-3">إلغاء الموعد</button>
+                    </form>
+                `;
+            }
+            
+            document.getElementById('modalActions').innerHTML = actionsHtml;
+            
+            // فتح المودال
+            var myModal = new bootstrap.Modal(document.getElementById('appointmentModal'));
+            myModal.show();
+        }
+    </script>
+
+    <style>
+        .active-btn {
+            background-color: var(--primary-light) !important;
+            color: var(--primary) !important;
+            font-weight: bold;
+            box-shadow: 0 2px 8px rgba(13, 148, 136, 0.08);
+        }
+    </style>
+}

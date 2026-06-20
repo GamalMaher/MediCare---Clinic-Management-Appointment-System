@@ -1,0 +1,109 @@
+@model BookAppointmentViewModel
+@{
+    ViewData["Title"] = "حجز موعد";
+}
+
+<div class="container mt-5 mb-5 text-end" dir="rtl">
+    <div class="row justify-content-center g-4">
+        <!-- نموذج الحجز -->
+        <div class="col-lg-7 col-md-6">
+            <div class="card shadow-lg border-0 rounded-lg">
+                <div class="card-header bg-success text-white text-center py-4">
+                    <h3 class="font-weight-light my-1 fw-bold">حجز موعد جديد</h3>
+                </div>
+                <div class="card-body p-4">
+                    <div class="alert alert-info border-0 shadow-sm text-center mb-4">
+                        <h5 class="alert-heading mb-1"><i class="bi bi-person-circle"></i> الطبيب المعالج</h5>
+                        <p class="mb-0 fw-bold fs-5 text-primary">د. @Model.DoctorName</p>
+                    </div>
+
+                    <form asp-action="Book" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                        
+                        <input type="hidden" asp-for="DoctorId" />
+                        <input type="hidden" asp-for="DoctorName" />
+
+                        <div class="mb-3">
+                            <label asp-for="AppointmentDate" class="form-label fw-bold">تاريخ الحجز</label>
+                            <input asp-for="AppointmentDate" type="date" class="form-control form-control-lg" min="@Model.MinDate.ToString("yyyy-MM-dd")" />
+                            <span asp-validation-for="AppointmentDate" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="StartTime" class="form-label fw-bold">وقت الحجز المفضّل</label>
+                            <input asp-for="StartTime" type="time" class="form-control form-control-lg" />
+                            <span asp-validation-for="StartTime" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Reason" class="form-label fw-bold">سبب الزيارة أو الأعراض (إن وجد)</label>
+                            <textarea asp-for="Reason" class="form-control" rows="3" placeholder="مثال: فحص دوري، ألم بالظهر..."></textarea>
+                            <span asp-validation-for="Reason" class="text-danger"></span>
+                        </div>
+
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-success btn-lg shadow-sm">تأكيد حجز الموعد</button>
+                            <a asp-controller="Doctor" asp-action="Index" class="btn btn-outline-secondary btn-lg">إلغاء والعودة لقائمة الأطباء</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- أوقات العمل المتاحة -->
+        <div class="col-lg-5 col-md-6">
+            <div class="card shadow-lg border-0 rounded-lg">
+                <div class="card-header bg-primary text-white text-center py-4">
+                    <h3 class="font-weight-light my-1 fw-bold"><i class="bi bi-clock-history"></i> أوقات العمل المتاحة</h3>
+                </div>
+                <div class="card-body p-4">
+                    @{
+                        var dayNamesArabic = new Dictionary<DayOfWeek, string>
+                        {
+                            { DayOfWeek.Sunday, "الأحد" },
+                            { DayOfWeek.Monday, "الاثنين" },
+                            { DayOfWeek.Tuesday, "الثلاثاء" },
+                            { DayOfWeek.Wednesday, "الأربعاء" },
+                            { DayOfWeek.Thursday, "الخميس" },
+                            { DayOfWeek.Friday, "الجمعة" },
+                            { DayOfWeek.Saturday, "السبت" }
+                        };
+                    }
+                    @if (Model.WorkingHours != null && Model.WorkingHours.Any())
+                    {
+                        <p class="text-muted text-center mb-4">هذه هي الأوقات الرسمية المحددة لتواجد الطبيب في العيادة:</p>
+                        <div class="list-group">
+                            @foreach (var wh in Model.WorkingHours)
+                            {
+                                <div class="list-group-item d-flex justify-content-between align-items-center py-3 border-0 border-bottom">
+                                    <span class="fw-bold text-secondary"><i class="bi bi-calendar2-day text-primary me-1"></i> @dayNamesArabic[wh.DayOfWeek]</span>
+                                    <div>
+                                        <span class="badge bg-light text-primary border border-primary px-3 py-2 fs-6">
+                                            @DateTime.Today.Add(wh.StartTime).ToString(@"hh\:mm tt")
+                                        </span>
+                                        <span class="text-muted mx-1">إلى</span>
+                                        <span class="badge bg-light text-primary border border-primary px-3 py-2 fs-6">
+                                            @DateTime.Today.Add(wh.EndTime).ToString(@"hh\:mm tt")
+                                        </span>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-warning text-center border-0 py-4 mb-0">
+                            <i class="bi bi-exclamation-triangle-fill text-warning fs-1 mb-2"></i>
+                            <p class="mb-0 fw-bold">عذراً، لم يقم الطبيب بتحديد أوقات عمله بعد.</p>
+                            <p class="small text-muted mb-0">يرجى التواصل مع إدارة المستشفى للمساعدة.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,130 @@
+@model CreateMedicalRecordViewModel
+@{
+    ViewData["Title"] = "إضافة تقرير طبي";
+}
+
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-lg border-0 rounded-lg">
+                <div class="card-header bg-success text-white text-center py-4">
+                    <h3 class="font-weight-light my-1 fw-bold"><i class="bi bi-file-earmark-medical me-1"></i> إضافة تقرير طبي جديد</h3>
+                </div>
+                <div class="card-body p-4 text-end" dir="rtl" style="text-align: right;">
+                    <div class="alert alert-light border shadow-sm p-3 mb-4 text-center">
+                        <span class="text-secondary fw-bold">المريض:</span>
+                        <h5 class="fw-bold text-primary mb-0">@Model.PatientName</h5>
+                    </div>
+
+                    <form asp-action="Create" method="post" enctype="multipart/form-data">
+                        @Html.AntiForgeryToken()
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                        <input type="hidden" asp-for="PatientId" />
+                        <input type="hidden" asp-for="PatientName" />
+
+                        <!-- بيانات التقرير -->
+                        <div class="mb-3">
+                            <label asp-for="Diagnosis" class="form-label fw-bold">التشخيص الطبي (Diagnosis)</label>
+                            <textarea asp-for="Diagnosis" class="form-control" rows="3" placeholder="اكتب تشخيص حالة المريض بالتفصيل..."></textarea>
+                            <span asp-validation-for="Diagnosis" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Treatment" class="form-label fw-bold">الخطة العلاجية والتعليمات (Treatment & Notes)</label>
+                            <textarea asp-for="Treatment" class="form-control" rows="4" placeholder="اكتب العلاج الموصوف، الجرعات، والتعليمات الطبية للمريض..."></textarea>
+                            <span asp-validation-for="Treatment" class="text-danger"></span>
+                        </div>
+
+                        <!-- الروشتة المرفقة (Dynamic Table) -->
+                        <div class="card p-3 bg-light border-0 mb-4 mt-4 shadow-sm">
+                            <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-3">
+                                <h5 class="text-secondary mb-0 fw-bold"><i class="bi bi-prescription"></i> تحرير روشتة علاجية</h5>
+                                <button type="button" class="btn btn-primary btn-sm rounded-pill px-3" onclick="addPrescriptionRow()">
+                                    <i class="bi bi-plus-circle me-1"></i> إضافة دواء
+                                </button>
+                            </div>
+
+                            <div class="table-responsive">
+                                <table class="table table-borderless align-middle" id="prescriptions-table">
+                                    <thead>
+                                        <tr class="text-secondary">
+                                            <th scope="col" style="width: 35%; text-align: right;">اسم الدواء</th>
+                                            <th scope="col" style="width: 20%; text-align: right;">الجرعة</th>
+                                            <th scope="col" style="width: 20%; text-align: right;">التكرار</th>
+                                            <th scope="col" style="width: 15%; text-align: right;">المدة (أيام)</th>
+                                            <th scope="col" style="width: 10%; text-align: center;">إجراء</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- سيتم إضافة الصفوف هنا ديناميكياً بواسطة الجافاسكربت -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- المرفقات الطبية -->
+                        <div class="mb-4 mt-4">
+                            <label asp-for="Attachments" class="form-label fw-bold"><i class="bi bi-cloud-arrow-up-fill me-1"></i> رفع مستندات طبية ومرفقات (صور أشعة، تحاليل، ملفات PDF)</label>
+                            <input asp-for="Attachments" type="file" multiple class="form-control form-control-lg" />
+                            <span asp-validation-for="Attachments" class="text-danger"></span>
+                            <div class="form-text text-muted">يمكنك اختيار أكثر من ملف في نفس الوقت.</div>
+                        </div>
+
+                        <div class="d-grid gap-2 mt-5">
+                            <button type="submit" class="btn btn-success btn-lg shadow-sm">حفظ التقرير الطبي والروشتة</button>
+                            <a asp-action="PatientHistory" asp-route-patientId="@Model.PatientId" class="btn btn-outline-secondary btn-lg">إلغاء والتراجع</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        var rowCount = 0;
+
+        function addPrescriptionRow() {
+            var tbody = document.querySelector("#prescriptions-table tbody");
+            
+            var rowHtml = `
+                <tr id="pres-row-${rowCount}">
+                    <td>
+                        <input name="Prescriptions[${rowCount}].MedicationName" class="form-control" placeholder="اسم الدواء العلمي/التجاري" required />
+                    </td>
+                    <td>
+                        <input name="Prescriptions[${rowCount}].Dosage" class="form-control" placeholder="مثال: 500 ملجم" required />
+                    </td>
+                    <td>
+                        <input name="Prescriptions[${rowCount}].Frequency" class="form-control" placeholder="مثال: 3 مرات يومياً" required />
+                    </td>
+                    <td>
+                        <input name="Prescriptions[${rowCount}].DurationDays" type="number" class="form-control" min="1" value="7" required />
+                    </td>
+                    <td class="text-center">
+                        <button type="button" class="btn btn-outline-danger btn-sm rounded-circle shadow-sm" onclick="removePrescriptionRow(${rowCount})">
+                            <i class="bi bi-trash-fill"></i>
+                        </button>
+                    </td>
+                </tr>
+            `;
+            
+            tbody.insertAdjacentHTML('beforeend', rowHtml);
+            rowCount++;
+        }
+
+        function removePrescriptionRow(index) {
+            var row = document.getElementById("pres-row-" + index);
+            if (row) {
+                row.remove();
+            }
+        }
+
+        // إضافة صف أول تلقائي للتسهيل
+        document.addEventListener('DOMContentLoaded', function() {
+            addPrescriptionRow();
+        });
+    </script>
+    <partial name="_ValidationScriptsPartial" />
+}

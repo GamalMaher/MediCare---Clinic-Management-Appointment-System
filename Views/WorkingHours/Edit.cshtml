@@ -1,0 +1,106 @@
+@model WorkingHoursViewModel
+@{
+    ViewData["Title"] = "تعديل أوقات تواجد الطبيب";
+}
+
+<div class="container mt-5 mb-5 text-end">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="med-card shadow-lg border-0">
+                <div class="med-card-header text-center py-4">
+                    <h3 class="my-1 text-white fw-bold"><i class="bi bi-clock-history me-1"></i> تعديل أوقات العمل الأسبوعية</h3>
+                </div>
+                <div class="card-body p-4" dir="rtl">
+                    
+                    <!-- ترويسة الطبيب -->
+                    <div class="med-card bg-light border-0 p-3 mb-4 text-center">
+                        <span class="text-secondary fw-bold small">الطبيب:</span>
+                        <h5 class="fw-bold text-primary mb-0 mt-1">@Model.DoctorName</h5>
+                    </div>
+
+                    <form asp-action="Edit" method="post">
+                        @Html.AntiForgeryToken()
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                        <input type="hidden" asp-for="DoctorId" />
+                        <input type="hidden" asp-for="DoctorName" />
+
+                        <!-- قائمة الأيام وتعديلها -->
+                        <div class="mb-4">
+                            <h6 class="fw-bold text-secondary mb-3"><i class="bi bi-gear-fill me-1 text-primary"></i> حدد الأيام والأوقات المتاحة لك:</h6>
+                            
+                            <div class="d-flex flex-column gap-2">
+                                @for (int i = 0; i < Model.Days.Count; i++)
+                                {
+                                    <div class="med-card p-3 shadow-none border-light day-row-wrapper" id="row-@i" style="background-color: @(Model.Days[i].IsWorking ? "#fff" : "#f8fafc"); transition: all 0.2s;">
+                                        <div class="row align-items-center g-3">
+                                            
+                                            <!-- مفتاح التشغيل والتعطيل -->
+                                            <div class="col-sm-3 d-flex align-items-center">
+                                                <div class="form-check form-switch ps-0 ms-3">
+                                                    <input asp-for="Days[i].IsWorking" class="form-check-input ms-0 float-end" type="checkbox" id="switch-@i" onchange="toggleDayInputs(@i)" style="width: 2.5em; height: 1.25em; cursor: pointer;" />
+                                                </div>
+                                                <label class="form-check-label fw-bold cursor-pointer text-dark me-2" for="switch-@i">
+                                                    @Model.Days[i].DayName
+                                                </label>
+                                                <input type="hidden" asp-for="Days[i].DayOfWeek" />
+                                                <input type="hidden" asp-for="Days[i].DayName" />
+                                            </div>
+
+                                            <!-- وقت البدء -->
+                                            <div class="col-sm-4 d-flex align-items-center gap-2">
+                                                <span class="text-muted small" style="min-width: 60px;">من الساعة:</span>
+                                                <input asp-for="Days[i].StartTime" type="time" class="form-control med-input" id="start-time-@i" disabled="@(!Model.Days[i].IsWorking)" />
+                                            </div>
+
+                                            <!-- وقت الانتهاء -->
+                                            <div class="col-sm-4 d-flex align-items-center gap-2">
+                                                <span class="text-muted small" style="min-width: 60px;">إلى الساعة:</span>
+                                                <input asp-for="Days[i].EndTime" type="time" class="form-control med-input" id="end-time-@i" disabled="@(!Model.Days[i].IsWorking)" />
+                                            </div>
+
+                                            <div class="col-sm-1 text-center d-none d-sm-block">
+                                                <i class="bi bi-clock text-muted" id="icon-@i" style="font-size: 1.2rem; color: @(Model.Days[i].IsWorking ? "var(--primary)" : "#ccc");"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+
+                        <!-- الأزرار الرئيسية لحفظ والتراجع -->
+                        <div class="d-flex flex-column flex-sm-row gap-2 mt-4">
+                            <button type="submit" class="med-btn med-btn-primary flex-grow-1 py-3"><i class="bi bi-save me-1"></i> حفظ التغييرات</button>
+                            <a asp-action="Index" asp-route-doctorId="@Model.DoctorId" class="med-btn med-btn-outline px-4 py-3 text-center">إلغاء والتراجع</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function toggleDayInputs(index) {
+            const isChecked = document.getElementById('switch-' + index).checked;
+            const startInput = document.getElementById('start-time-' + index);
+            const endInput = document.getElementById('end-time-' + index);
+            const rowWrapper = document.getElementById('row-' + index);
+            const clockIcon = document.getElementById('icon-' + index);
+
+            startInput.disabled = !isChecked;
+            endInput.disabled = !isChecked;
+
+            if (isChecked) {
+                rowWrapper.style.backgroundColor = '#ffffff';
+                rowWrapper.style.borderColor = 'rgba(13, 148, 136, 0.2)';
+                if (clockIcon) clockIcon.style.color = 'var(--primary)';
+            } else {
+                rowWrapper.style.backgroundColor = '#f8fafc';
+                rowWrapper.style.borderColor = '#edf2f7';
+                if (clockIcon) clockIcon.style.color = '#ccc';
+            }
+        }
+    </script>
+    <partial name="_ValidationScriptsPartial" />
+}

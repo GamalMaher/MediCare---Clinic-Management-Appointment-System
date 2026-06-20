@@ -1,0 +1,233 @@
+@model IEnumerable<Medicare.Models.Doctor>
+@{
+    ViewData["Title"] = "أطباؤنا المتميزون";
+}
+
+<!-- خريطة ربط التخصصات بالأعراض الشائعة باللغة العربية للبحث التفاعلي -->
+@functions {
+    string GetDoctorSymptoms(string specName)
+    {
+        specName = specName.ToLower();
+        if (specName.Contains("أسنان") || specName.Contains("dent"))
+            return "أسنان, وجع ضرس, لثة, خلع, حشو, تقويم, فم";
+        if (specName.Contains("باطن") || specName.Contains("intern") || specName.Contains("جهاز هضمي"))
+            return "بطن, مغص, معدة, هضم, باطنة, قولون, كبد, غثيان";
+        if (specName.Contains("عظام") || specName.Contains("ortho"))
+            return "عظام, مفاصل, كسر, ركبة, ظهر, فقرات, غضروف, التواء";
+        if (specName.Contains("أطفال") || specName.Contains("pedi"))
+            return "أطفال, رضع, سخونة, تطعيم, مغص أطفال, حديثي الولادة";
+        if (specName.Contains("عيون") || specName.Contains("رمد") || specName.Contains("opht"))
+            return "عيون, رمد, نظارة, رؤية, ضعف نظر, قرنية, التهاب عيون";
+        if (specName.Contains("أعصاب") || specName.Contains("neuro") || specName.Contains("مخ"))
+            return "أعصاب, صداع, دوخة, فقرات, تنميل, شلل, تشنج, مخ";
+        if (specName.Contains("قلب") || specName.Contains("cardio"))
+            return "قلب, ضغط, شرايين, نبض, صدر, ضيق تنفس";
+        if (specName.Contains("جلد") || specName.Contains("derm"))
+            return "جلدية, حساسية, حكة, شعر, بشرة, حب شباب, أكزيما";
+        
+        return "عام, كشف, استشارة";
+    }
+}
+
+<div class="container mt-4 mb-5 text-end">
+    <!-- العنوان الرئيسي -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+        <div>
+            <h2 class="text-primary fw-bold mb-1"><i class="bi bi-people-fill me-2"></i> أطباؤنا المتميزون</h2>
+            <p class="text-muted mb-0">ابحث عن الطبيب المناسب واحجز موعدك فوراً بكل سهولة.</p>
+        </div>
+        @if (User.IsInRole("Admin"))
+        {
+            <a asp-action="Create" class="med-btn med-btn-primary shadow-sm">
+                <i class="bi bi-person-plus-fill"></i> إضافة طبيب جديد
+            </a>
+        }
+    </div>
+
+    <!-- لوحة البحث الذكية وفحص الأعراض -->
+    <div class="symptom-panel mb-5">
+        <h5 class="fw-bold mb-3 text-secondary"><i class="bi bi-patch-question me-1 text-primary"></i> بماذا تشعر؟ اختر العرض لتصفية الأطباء:</h5>
+        
+        <!-- أزرار الأعراض الشائعة (Symptom Pills) -->
+        <div class="d-flex flex-wrap gap-2 mb-4">
+            <span class="symptom-pill active" data-symptom="all">الكل</span>
+            <span class="symptom-pill" data-symptom="أسنان">ألم الأسنان / لثة</span>
+            <span class="symptom-pill" data-symptom="بطن">مغص / آلام المعدة</span>
+            <span class="symptom-pill" data-symptom="عظام">آلام المفاصل / العظام / الظهر</span>
+            <span class="symptom-pill" data-symptom="أطفال">أطفال ورضع</span>
+            <span class="symptom-pill" data-symptom="عيون">رمد / مشاكل العيون والعيون</span>
+            <span class="symptom-pill" data-symptom="أعصاب">صداع / آلام الأعصاب</span>
+            <span class="symptom-pill" data-symptom="قلب">ألم في الصدر / ضغط الدم</span>
+            <span class="symptom-pill" data-symptom="جلدية">مشاكل الجلدية والتجميل</span>
+        </div>
+
+        <!-- حقل البحث الكتابي -->
+        <div class="input-group">
+            <span class="input-group-text bg-white border-end-0 text-muted" id="search-addon">
+                <i class="bi bi-search"></i>
+            </span>
+            <input type="text" id="doctor-search" class="form-control med-input border-start-0 ps-0" placeholder="ابحث باسم الطبيب، التخصص، أو المرض الذي تعاني منه..." aria-describedby="search-addon" />
+        </div>
+    </div>
+
+    <!-- شبكة بطاقات الأطباء -->
+    <div class="row g-4" id="doctors-container">
+        @if (!Model.Any())
+        {
+            <div class="col-12 text-center py-5 text-muted">
+                <i class="bi bi-person-x" style="font-size: 4rem; color: #ccc;"></i>
+                <h4 class="mt-3">لا يوجد أطباء متوفرون حالياً في المنصة</h4>
+            </div>
+        }
+        else
+        {
+            @foreach (var item in Model)
+            {
+                var docSymptoms = GetDoctorSymptoms(item.Specialization.Name + " " + (item.Specialization.Description ?? ""));
+                
+                <div class="col-md-6 col-lg-4 doctor-card-wrapper" 
+                     data-name="@(item.User.FirstName) @(item.User.LastName)" 
+                     data-specialization="@item.Specialization.Name" 
+                     data-symptoms="@docSymptoms">
+                    
+                    <div class="med-card h-100 p-4 d-flex flex-column justify-content-between position-relative">
+                        <!-- ترويسة بطاقة الطبيب -->
+                        <div>
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="med-avatar me-3">
+                                    @(item.User.FirstName.Substring(0, 1) + item.User.LastName.Substring(0, 1))
+                                </div>
+                                <div class="me-3">
+                                    <h5 class="mb-1 fw-bold text-dark">د. @item.User.FirstName @item.User.LastName</h5>
+                                    <span class="med-badge med-badge-primary">
+                                        @item.Specialization.Name
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- السعر وتفاصيل الاتصال -->
+                            <div class="my-3 border-top border-bottom py-2">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <span class="text-muted small"><i class="bi bi-cash-stack me-1 text-primary"></i> سعر الكشف:</span>
+                                    <span class="fw-bold text-success">@item.ConsultationFee.ToString("N0") جنيه</span>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="text-muted small"><i class="bi bi-telephone me-1 text-primary"></i> الهاتف:</span>
+                                    <span class="text-secondary small">@item.PhoneNumber</span>
+                                </div>
+                            </div>
+
+                            <!-- الكلمات المفتاحية / الأعراض التابعة للتخصص -->
+                            <div class="mb-3">
+                                <span class="text-muted small d-block mb-1">يعالج أعراض:</span>
+                                <div class="d-flex flex-wrap gap-1">
+                                    @foreach (var sym in docSymptoms.Split(','))
+                                    {
+                                        <span class="badge bg-light text-secondary border-0 px-2 py-1 fs-8">@sym.Trim()</span>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- شارة ترشيح ذكية تظهر عند الفلترة -->
+                        <span class="med-badge med-badge-success position-absolute top-0 start-0 m-3 d-none rec-badge">
+                            <i class="bi bi-bookmark-star-fill me-1"></i> مرشح لشكواك
+                        </span>
+
+                        <!-- أزرار الإجراءات للبطاقة -->
+                        <div class="d-flex gap-2 mt-3">
+                            <a asp-action="Details" asp-route-id="@item.Id" class="med-btn med-btn-outline btn-sm flex-grow-1">التفاصيل</a>
+                            
+                            @if (User.IsInRole("Patient"))
+                            {
+                                <a asp-controller="Appointment" asp-action="Book" asp-route-doctorId="@item.Id" class="med-btn med-btn-primary btn-sm flex-grow-1">
+                                    <i class="bi bi-calendar-plus me-1"></i> احجز الآن
+                                </a>
+                            }
+                        </div>
+
+                        <!-- أزرار التحكم للإدارة -->
+                        @if (User.IsInRole("Admin") || (User.IsInRole("Doctor") && User.Identity.Name == item.User.Email))
+                        {
+                            <div class="d-flex justify-content-end gap-1 mt-3 pt-2 border-top border-light">
+                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-warning btn-sm py-1 px-3 rounded-pill fs-7">تعديل</a>
+                                @if (User.IsInRole("Admin"))
+                                {
+                                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-outline-danger btn-sm py-1 px-3 rounded-pill fs-7">حذف</a>
+                                }
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const searchInput = document.getElementById('doctor-search');
+            const symptomPills = document.querySelectorAll('.symptom-pill');
+            const docCards = document.querySelectorAll('.doctor-card-wrapper');
+            let activeSymptom = 'all';
+
+            // تصفية الأطباء بناءً على حقل البحث والزر المختار
+            function filterDoctors() {
+                const query = searchInput.value.toLowerCase().trim();
+
+                docCards.forEach(card => {
+                    const name = card.getAttribute('data-name').toLowerCase();
+                    const spec = card.getAttribute('data-specialization').toLowerCase();
+                    const symptoms = card.getAttribute('data-symptoms').toLowerCase();
+                    const recBadge = card.querySelector('.rec-badge');
+
+                    // التحقق من المطابقة النصية للبحث
+                    const matchesQuery = name.includes(query) || spec.includes(query) || symptoms.includes(query);
+
+                    // التحقق من مطابقة العرض الطبي
+                    let matchesSymptom = false;
+                    if (activeSymptom === 'all') {
+                        matchesSymptom = true;
+                        if (recBadge) recBadge.classList.add('d-none'); // إخفاء شارة الترشيح عند عرض الكل
+                    } else {
+                        matchesSymptom = symptoms.includes(activeSymptom);
+                        if (recBadge) {
+                            if (matchesSymptom) {
+                                recBadge.classList.remove('d-none');
+                            } else {
+                                recBadge.classList.add('d-none');
+                            }
+                        }
+                    }
+
+                    // إظهار أو إخفاء الكرت بناءً على الشروط
+                    if (matchesQuery && (activeSymptom === 'all' || matchesSymptom)) {
+                        card.style.display = 'block';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            }
+
+            // النقر على أزرار الأعراض (Pills)
+            symptomPills.forEach(pill => {
+                pill.addEventListener('click', function () {
+                    symptomPills.forEach(p => p.classList.remove('active'));
+                    this.classList.add('active');
+                    activeSymptom = this.getAttribute('data-symptom');
+                    
+                    // إذا تم اختيار عرض معين، نقوم بملء خانة البحث باسم العرض لتسهيل الفهم
+                    if (activeSymptom !== 'all' && searchInput.value === '') {
+                        // لا نملأ مربع البحث لتجربة أنظف، فقط نفلتر
+                    }
+                    
+                    filterDoctors();
+                });
+            });
+
+            // الكتابة في مربع البحث
+            searchInput.addEventListener('input', filterDoctors);
+        });
+    </script>
+}

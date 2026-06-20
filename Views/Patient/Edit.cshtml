@@ -1,0 +1,55 @@
+@model EditPatientViewModel
+@{
+    ViewData["Title"] = "تعديل بيانات المريض";
+}
+
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-lg border-0 rounded-lg">
+                <div class="card-header bg-warning text-dark text-center py-4">
+                    <h3 class="font-weight-light my-1 fw-bold">تعديل بيانات المريض</h3>
+                </div>
+                <div class="card-body p-4">
+                    <form asp-action="Edit" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                        <input type="hidden" asp-for="Id" />
+
+                        <div class="mb-3">
+                            <label asp-for="BloodType" class="form-label fw-bold">فصيلة الدم</label>
+                            <input asp-for="BloodType" class="form-control" />
+                            <span asp-validation-for="BloodType" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="DateOfBirth" class="form-label fw-bold">تاريخ الميلاد</label>
+                            <input asp-for="DateOfBirth" type="date" class="form-control" asp-format="{0:yyyy-MM-dd}" />
+                            <span asp-validation-for="DateOfBirth" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="PhoneNumber" class="form-label fw-bold">رقم الهاتف</label>
+                            <input asp-for="PhoneNumber" class="form-control" />
+                            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Allergies" class="form-label fw-bold">الحساسية والأمراض المزمنة (إن وجدت)</label>
+                            <textarea asp-for="Allergies" class="form-control" rows="3"></textarea>
+                            <span asp-validation-for="Allergies" class="text-danger"></span>
+                        </div>
+
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-warning btn-lg shadow-sm">حفظ التغييرات</button>
+                            <a asp-action="Index" class="btn btn-outline-secondary btn-lg">إلغاء والعودة للقائمة</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

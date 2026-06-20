@@ -1,0 +1,35 @@
+@model Medicare.Models.Doctor
+@{
+    ViewData["Title"] = "حذف الطبيب";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow border-0 rounded-lg">
+                <div class="card-header bg-danger text-white text-center py-4">
+                    <h3 class="font-weight-light my-1 fw-bold">تأكيد حذف الطبيب</h3>
+                </div>
+                <div class="card-body p-4 text-center">
+                    <div class="text-danger mb-4">
+                        <i class="bi bi-exclamation-triangle-fill" style="font-size: 4rem;"></i>
+                    </div>
+                    
+                    <h4 class="mb-3">هل أنت متأكد من رغبتك في حذف الطبيب؟</h4>
+                    <p class="text-muted mb-4">
+                        سيتم حذف حساب الطبيب <strong>د. @Model.User.FirstName @Model.User.LastName</strong> وجميع تفاصيل عمله من النظام نهائياً. لا يمكن التراجع عن هذا الإجراء.
+                    </p>
+
+                    <form asp-action="Delete" method="post">
+                        <input type="hidden" asp-for="Id" />
+                        
+                        <div class="d-flex justify-content-center gap-3">
+                            <button type="submit" class="btn btn-danger btn-lg px-4 rounded-pill shadow-sm">تأكيد الحذف</button>
+                            <a asp-action="Index" class="btn btn-outline-secondary btn-lg px-4 rounded-pill">إلغاء والعودة</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

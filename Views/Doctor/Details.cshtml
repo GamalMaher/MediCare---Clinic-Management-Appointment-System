@@ -1,0 +1,84 @@
+@model DoctorDetailViewModel
+@{
+    ViewData["Title"] = "تفاصيل الطبيب";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow border-0 rounded-lg">
+                <div class="card-header bg-primary text-white text-center py-4">
+                    <h3 class="font-weight-light my-1 fw-bold">الملف التعريفي للطبيب</h3>
+                </div>
+                <div class="card-body p-5">
+                    <div class="text-center mb-4">
+                        <div class="avatar bg-primary text-white rounded-circle d-inline-flex justify-content-center align-items-center mb-3 shadow" style="width: 80px; height: 80px; font-weight: bold; font-size: 2rem;">
+                            @(Model.FirstName.Substring(0, 1) + Model.LastName.Substring(0, 1))
+                        </div>
+                        <h3 class="fw-bold">د. @Model.FirstName @Model.LastName</h3>
+                        <span class="badge bg-info text-dark px-3 py-2 rounded-pill fs-6 mt-1">@Model.Specialization</span>
+                    </div>
+
+                    <hr />
+
+                    <div class="row mt-4">
+                        <div class="col-sm-4 fw-bold text-secondary mb-2">رقم الهاتف:</div>
+                        <div class="col-sm-8 mb-2">@Model.PhoneNumber</div>
+
+                        <div class="col-sm-4 fw-bold text-secondary mb-2">رقم الترخيص الطبي:</div>
+                        <div class="col-sm-8 mb-2">@Model.LicenseNumber</div>
+
+                        <div class="col-sm-4 fw-bold text-secondary mb-2">سعر الكشف:</div>
+                        <div class="col-sm-8 mb-2 fw-bold text-success">@Model.ConsultationFee.ToString("C")</div>
+                    </div>
+
+                    @if (Model.WorkingHours != null && Model.WorkingHours.Any())
+                    {
+                        <hr class="my-4" />
+                        <div class="mt-3">
+                            <h5 class="fw-bold text-primary mb-3"><i class="bi bi-clock-history me-1"></i> أوقات العمل وتواجد الطبيب:</h5>
+                            <div class="row g-2 text-end" dir="rtl">
+                                @{
+                                    var dayNamesArabic = new Dictionary<DayOfWeek, string>
+                                    {
+                                        { DayOfWeek.Sunday, "الأحد" },
+                                        { DayOfWeek.Monday, "الاثنين" },
+                                        { DayOfWeek.Tuesday, "الثلاثاء" },
+                                        { DayOfWeek.Wednesday, "الأربعاء" },
+                                        { DayOfWeek.Thursday, "الخميس" },
+                                        { DayOfWeek.Friday, "الجمعة" },
+                                        { DayOfWeek.Saturday, "السبت" }
+                                    };
+                                }
+                                @foreach (var wh in Model.WorkingHours)
+                                {
+                                    <div class="col-sm-6">
+                                        <div class="border rounded p-3 bg-light d-flex justify-content-between align-items-center">
+                                            <span class="fw-bold text-dark"><i class="bi bi-calendar2-day text-success me-1"></i> @dayNamesArabic[wh.DayOfWeek]</span>
+                                            <span class="badge bg-white text-primary border border-primary px-2 py-1 fs-6">
+                                                @DateTime.Today.Add(wh.StartTime).ToString(@"hh\:mm tt") - @DateTime.Today.Add(wh.EndTime).ToString(@"hh\:mm tt")
+                                            </span>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+
+                    <div class="d-flex justify-content-center gap-3 mt-5">
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning px-4 btn-lg rounded-pill shadow-sm">تعديل الملف</a>
+                            <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger px-4 btn-lg rounded-pill shadow-sm">حذف الطبيب</a>
+                        }
+                        @if (User.IsInRole("Patient"))
+                        {
+                            <a asp-controller="Appointment" asp-action="Book" asp-route-doctorId="@Model.Id" class="btn btn-success px-4 btn-lg rounded-pill shadow-sm"><i class="bi bi-calendar-plus me-1"></i> احجز موعد الآن</a>
+                        }
+                        <a asp-action="Index" class="btn btn-outline-secondary px-4 btn-lg rounded-pill">العودة للقائمة</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

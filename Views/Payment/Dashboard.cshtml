@@ -1,0 +1,216 @@
+@{
+    ViewData["Title"] = "لوحة التحكم المالية";
+}
+
+<style>
+    .stat-card { border-radius: 18px; border: none; transition: transform 0.2s, box-shadow 0.2s; }
+    .stat-card:hover { transform: translateY(-4px); box-shadow: 0 12px 30px rgba(0,0,0,0.12) !important; }
+    .stat-icon { width: 60px; height: 60px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; }
+    .chart-card { border-radius: 18px; border: none; }
+</style>
+
+<div class="container-fluid px-4 mt-4 mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold text-primary mb-1"><i class="bi bi-speedometer2 me-2"></i> لوحة التحكم المالية</h2>
+            <p class="text-muted mb-0">نظرة شاملة على الأداء والإيرادات</p>
+        </div>
+        <a asp-action="Index" class="btn btn-outline-primary rounded-pill px-4">
+            <i class="bi bi-journal-text me-1"></i> سجل المدفوعات
+        </a>
+    </div>
+
+    <!-- KPI Stat Cards -->
+    <div class="row g-3 mb-4">
+        <!-- Total Revenue -->
+        <div class="col-6 col-md-3">
+            <div class="card shadow-sm stat-card p-4" style="background: linear-gradient(135deg,#0d6efd,#0a58ca);">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <p class="text-white-50 mb-1 small fw-semibold">إجمالي الإيرادات</p>
+                        <h3 class="fw-bold text-white mb-0">@(((decimal)ViewBag.TotalRevenue).ToString("F0"))</h3>
+                        <small class="text-white-50">جنيه مصري</small>
+                    </div>
+                    <div class="stat-icon bg-white bg-opacity-25 text-white">
+                        <i class="bi bi-currency-dollar"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Completed Payments -->
+        <div class="col-6 col-md-3">
+            <div class="card shadow-sm stat-card p-4" style="background: linear-gradient(135deg,#198754,#157347);">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <p class="text-white-50 mb-1 small fw-semibold">مدفوعات مكتملة</p>
+                        <h3 class="fw-bold text-white mb-0">@ViewBag.CompletedPayments</h3>
+                        <small class="text-white-50">معاملة</small>
+                    </div>
+                    <div class="stat-icon bg-white bg-opacity-25 text-white">
+                        <i class="bi bi-check-circle-fill"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Total Doctors -->
+        <div class="col-6 col-md-3">
+            <div class="card shadow-sm stat-card p-4" style="background: linear-gradient(135deg,#6f42c1,#59359a);">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <p class="text-white-50 mb-1 small fw-semibold">إجمالي الأطباء</p>
+                        <h3 class="fw-bold text-white mb-0">@ViewBag.TotalDoctors</h3>
+                        <small class="text-white-50">طبيب مسجل</small>
+                    </div>
+                    <div class="stat-icon bg-white bg-opacity-25 text-white">
+                        <i class="bi bi-person-badge-fill"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Total Patients -->
+        <div class="col-6 col-md-3">
+            <div class="card shadow-sm stat-card p-4" style="background: linear-gradient(135deg,#fd7e14,#e05f00);">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <p class="text-white-50 mb-1 small fw-semibold">إجمالي المرضى</p>
+                        <h3 class="fw-bold text-white mb-0">@ViewBag.TotalPatients</h3>
+                        <small class="text-white-50">مريض مسجل</small>
+                    </div>
+                    <div class="stat-icon bg-white bg-opacity-25 text-white">
+                        <i class="bi bi-people-fill"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Second Row Stats -->
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+            <div class="card shadow-sm stat-card p-4 border">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="stat-icon bg-info bg-opacity-15 text-info"><i class="bi bi-calendar-check"></i></div>
+                    <div>
+                        <p class="text-muted mb-0 small">إجمالي المواعيد</p>
+                        <h4 class="fw-bold mb-0">@ViewBag.TotalAppointments</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card shadow-sm stat-card p-4 border">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="stat-icon bg-success bg-opacity-15 text-success"><i class="bi bi-check2-all"></i></div>
+                    <div>
+                        <p class="text-muted mb-0 small">مواعيد مكتملة</p>
+                        <h4 class="fw-bold mb-0">@ViewBag.CompletedAppointments</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card shadow-sm stat-card p-4 border">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="stat-icon bg-warning bg-opacity-15 text-warning"><i class="bi bi-hourglass-split"></i></div>
+                    <div>
+                        <p class="text-muted mb-0 small">مدفوعات معلقة</p>
+                        <h4 class="fw-bold mb-0">@ViewBag.PendingPayments</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card shadow-sm stat-card p-4 border">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="stat-icon bg-danger bg-opacity-15 text-danger"><i class="bi bi-x-circle"></i></div>
+                    <div>
+                        <p class="text-muted mb-0 small">مدفوعات فاشلة</p>
+                        <h4 class="fw-bold mb-0">@ViewBag.FailedPayments</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="row g-4">
+        <!-- Monthly Revenue Line Chart -->
+        <div class="col-md-8">
+            <div class="card shadow-sm chart-card p-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold mb-0"><i class="bi bi-graph-up-arrow me-2 text-primary"></i> الإيرادات الشهرية (آخر 6 أشهر)</h5>
+                </div>
+                <canvas id="monthlyChart" height="100"></canvas>
+            </div>
+        </div>
+        <!-- Revenue by Specialization Doughnut -->
+        <div class="col-md-4">
+            <div class="card shadow-sm chart-card p-4">
+                <h5 class="fw-bold mb-3"><i class="bi bi-pie-chart-fill me-2 text-purple"></i> إيرادات حسب التخصص</h5>
+                <canvas id="specChart" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script>
+        const monthlyLabels = @Html.Raw(ViewBag.MonthlyLabels ?? "[]");
+        const monthlyData   = @Html.Raw(ViewBag.MonthlyData   ?? "[]");
+        const specLabels    = @Html.Raw(ViewBag.SpecLabels     ?? "[]");
+        const specData      = @Html.Raw(ViewBag.SpecData       ?? "[]");
+
+        // Monthly Revenue Chart
+        new Chart(document.getElementById('monthlyChart'), {
+            type: 'line',
+            data: {
+                labels: monthlyLabels,
+                datasets: [{
+                    label: 'الإيرادات (جنيه)',
+                    data: monthlyData,
+                    borderColor: '#0d6efd',
+                    backgroundColor: 'rgba(13,110,253,0.1)',
+                    borderWidth: 3,
+                    pointBackgroundColor: '#0d6efd',
+                    pointRadius: 5,
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+
+        // Specialization Doughnut Chart
+        const specColors = ['#0d6efd','#198754','#ffc107','#dc3545','#6f42c1','#fd7e14','#20c997'];
+        new Chart(document.getElementById('specChart'), {
+            type: 'doughnut',
+            data: {
+                labels: specLabels,
+                datasets: [{
+                    data: specData,
+                    backgroundColor: specColors,
+                    borderWidth: 0,
+                    hoverOffset: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                cutout: '65%',
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { font: { size: 11 }, padding: 12 }
+                    }
+                }
+            }
+        });
+    </script>
+}

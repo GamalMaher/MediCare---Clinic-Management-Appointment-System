@@ -1,0 +1,74 @@
+@model IEnumerable<Medicare.Models.Patient>
+@{
+    ViewData["Title"] = "إدارة المرضى";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-primary fw-bold">إدارة المرضى</h2>
+    </div>
+
+    <div class="card shadow border-0 rounded-lg">
+        <div class="card-body p-4">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light text-secondary text-uppercase fs-7">
+                        <tr>
+                            <th scope="col">الاسم</th>
+                            <th scope="col">فصيلة الدم</th>
+                            <th scope="col">رقم الهاتف</th>
+                            <th scope="col">تاريخ الميلاد</th>
+                            <th scope="col" class="text-center">الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (!Model.Any())
+                        {
+                            <tr>
+                                <td colspan="5" class="text-center py-5 text-muted">
+                                    <h5 class="my-2">لا يوجد مرضى مسجلين حالياً</h5>
+                                </td>
+                            </tr>
+                        }
+                        else
+                        {
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar bg-info text-dark rounded-circle d-flex justify-content-center align-items-center me-3" style="width: 45px; height: 45px; font-weight: bold; font-size: 1.1rem;">
+                                                @(item.User.FirstName.Substring(0, 1) + item.User.LastName.Substring(0, 1))
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-0 fw-bold">@item.User.FirstName @item.User.LastName</h6>
+                                                <small class="text-muted">ID: @item.Id</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-danger text-white px-3 py-2 rounded-pill fs-7">
+                                            @item.BloodType
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="text-secondary">@item.PhoneNumber</span>
+                                    </td>
+                                    <td>
+                                        <span class="text-secondary">@item.DateOfBirth.ToString("yyyy-MM-dd")</span>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex justify-content-center gap-2">
+                                            <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-primary btn-sm px-3 rounded-pill">التفاصيل</a>
+                                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-warning btn-sm px-3 rounded-pill">تعديل</a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

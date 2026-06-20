@@ -1,0 +1,18 @@
+@{
+    ViewData["Title"] = "غير مسموح بالدخول";
+}
+
+<div class="container mt-5 text-center">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card border-0 shadow">
+                <div class="card-body p-5">
+                    <h1 class="display-1 text-danger"><i class="bi bi-shield-lock"></i> 403</h1>
+                    <h3 class="my-4">عذراً، غير مصرح لك بدخول هذه الصفحة!</h3>
+                    <p class="text-muted">حسابك الحالي لا يمتلك الصلاحيات الكافية للوصول إلى هذه الصفحة. يرجى تسجيل الدخول بحساب يمتلك الصلاحية المطلوبة.</p>
+                    <a asp-action="Login" class="btn btn-primary btn-lg mt-3">تسجيل الدخول بحساب آخر</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
